@@ -126,7 +126,6 @@ int main(int argc, char *argv[])
 
     if (1 == argc) {
         dofile("stdin", stdin);
-        printf("curlen = %llu\n", (unsigned long long) curlen);
         quicksort((void **) buf, 0, curlen - 1, cmp);
         for (j = 0; j < curlen; j++) {
             puts(buf[j]);
