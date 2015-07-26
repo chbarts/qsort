@@ -54,6 +54,7 @@ static void usage(char *pname)
     puts("");
     puts("  -r, --reverse     Reverse the sense of the comparison");
     puts("  -n, --numer       Sort numerically, then non-numerically");
+    puts("  -u, --uniq        Uniqify output");
     puts("  -h, --help        Print this help");
     puts("  -v, --version     Print version information");
     puts("");
@@ -105,13 +106,14 @@ static void dofile(char *fname, FILE * fin)
 int main(int argc, char *argv[])
 {
     size_t j;
-    char *pname;
+    char *pname, *prev = NULL;
     FILE *fin;
-    int i, c, lind, numer = 0;
+    int i, c, lind, numer = 0, uniq = 0;
     extern int optind;
     struct option longopts[] = {
         {"reverse", 0, 0, 0},
         {"numer", 0, 0, 0},
+        {"uniq", 0, 0, 0},
         {"help", 0, 0, 0},
         {"version", 0, 0, 0},
         {0, 0, 0, 0}
@@ -138,7 +140,7 @@ int main(int argc, char *argv[])
 
     pname = argv[0];
 
-    while ((c = getopt_long(argc, argv, "rnhv", longopts, &lind)) != -1) {
+    while ((c = getopt_long(argc, argv, "rnuhv", longopts, &lind)) != -1) {
         switch (c) {
         case 0:
             switch (lind) {
@@ -149,10 +151,13 @@ int main(int argc, char *argv[])
                 numer = 1;
                 break;
             case 2:
+                uniq = 1;
+                break;
+            case 3:
                 usage(pname);
                 exit(EXIT_SUCCESS);
                 break;
-            case 3:
+            case 4:
                 version();
                 exit(EXIT_SUCCESS);
                 break;
@@ -169,6 +174,9 @@ int main(int argc, char *argv[])
             break;
         case 'n':
             numer = 1;
+            break;
+        case 'u':
+            uniq = 1;
             break;
         case 'h':
             usage(pname);
@@ -214,10 +222,24 @@ int main(int argc, char *argv[])
     }
 
     for (j = 0; j < curlen; j++) {
-        puts(buf[j]);
-        free(buf[j]);
+        if (1 == uniq) {
+            if (0 == j) {
+                puts(buf[j]);
+                prev = buf[j];
+            } else {
+                if (strcmp(prev, buf[j]))
+                    puts(buf[j]);
+                free(prev);
+                prev = buf[j];
+            }
+
+        } else {
+            puts(buf[j]);
+            free(buf[j]);
+        }
     }
 
+    free(prev);
     free(buf);
 
     return 0;
