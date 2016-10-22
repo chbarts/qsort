@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     int i;
     size_t j, len;
 
-    for (i = 0; i < argc; i++) {
+    for (i = 1; i < argc; i++) {
         len = strlen(argv[i]);
         for (j = 0; j < len/2; j++) {
             swap(argv[i], j, len - j - 1);
